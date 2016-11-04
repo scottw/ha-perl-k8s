@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+use Mojo::Redis2;
+
+helper redis => sub { shift->stash->{redis} ||= Mojo::Redis2->new; };
+
+## FIXME: add a version header to the response, so we can see we're talking to the right thing
+helper redis_response => sub {
+    my $c = shift;
+    return sub {
+        my ($d, $err, $value) = @_;
+        $c->render(text => ($err ? $err : $value))
+      }
+};
+
+get '/:key' => sub {
+    my $c = shift;
+    $c->render_later;
+
+    $c->delay(
+        sub {
+            $c->redis->get($c->param('key'), shift->begin);
+        },
+
+        $c->redis_response
+    );
+};
+
+put '/:key' => sub {
+    my $c = shift;
+    $c->render_later;
+
+    $c->delay(
+        sub {
+            $c->redis->set($c->param('key'), $c->req->body, shift->begin);
+        },
+
+        $c->redis_response
+    );
+};
+
+del '/:key' => sub {
+    my $c = shift;
+    $c->render_later;
+
+    $c->delay(
+        sub {
+            $c->redis->del($c->param('key'), shift->begin);
+        },
+
+        $c->redis_response
+    );
+};
+
+app->start;

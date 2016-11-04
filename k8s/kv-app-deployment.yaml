@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kv-app
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: kv-mojo
+        tier: frontend
+    spec:
+      containers:
+        - name: kv-mojo
+          image: scottw/kv-mojo:v6
+          env:
+            - name: MOJO_REDIS_URL
+              value: redis://kv-redis-master:6379
+          ports:
+            - containerPort: 3000
