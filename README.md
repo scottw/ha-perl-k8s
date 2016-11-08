@@ -1,6 +1,6 @@
 # High Availability Perl with Kubernetes
 
-This presentation covers deploying a simple Redis-backed Mojolicious application in a Kubenetes cluster.
+This presentation ([slides here](https://scottw.github.io/presentations/ha-perl-k8s/)) covers deploying a simple Redis-backed Mojolicious application in a Kubenetes cluster.
 
 The application is a simple GET/PUT/DELETE HTTP API for retrieving, setting, and deleting keys in a Redis instance.
 
