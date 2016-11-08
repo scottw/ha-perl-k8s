@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: kv-mojo
-          image: scottw/kv-mojo:v6
+          image: scottw/kv-mojo:v1
           env:
             - name: MOJO_REDIS_URL
               value: redis://kv-redis-master:6379
