@@ -4,13 +4,17 @@ use Mojo::Redis2;
 
 helper redis => sub { shift->stash->{redis} ||= Mojo::Redis2->new; };
 
-## FIXME: add a version header to the response, so we can see we're talking to the right thing
 helper redis_response => sub {
     my $c = shift;
     return sub {
         my ($d, $err, $value) = @_;
-        $c->render(text => ($err ? $err : $value))
-      }
+        $c->res->headers->header('kv-mojo-version' => $ENV{KV_VERSION} // 'v1');
+
+        $c->app->log->warn("Error: $err") if $err;
+
+        $value //= '';
+        $c->render(text => $value);
+    }
 };
 
 get '/:key' => sub {
@@ -51,5 +55,7 @@ del '/:key' => sub {
         $c->redis_response
     );
 };
+
+post '/die' => sub { kill TERM => $$ };
 
 app->start;

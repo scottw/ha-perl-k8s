@@ -1,28 +1,13 @@
-## local development
-start-redis:
-	docker run --name kv-redis -d -p 6379:6379 redis:alpine
-
-stop-redis:
-	docker stop kv-redis && docker rm kv-redis
-
+## Docker build target
 assert-version:
-	@if [[ "z$(VERSION)" == "z" ]]; then \
-		echo "VERSION not set"; exit 1; \
+	@if [[ "z$(KV_VERSION)" == "z" ]]; then \
+		echo "KV_VERSION not set"; exit 1; \
 	fi
 
-build-mojo: assert-version
-	docker build -t scottw/kv-mojo:$(VERSION) .
+build-app: assert-version
+	docker build -t scottw/kv-mojo:$(KV_VERSION) --build-arg KV_VERSION=$(KV_VERSION) .
 
-start-mojo:
-	docker run --name kv-mojo -p 3000:3000 -d scottw/kv-mojo
-
-stop-mojo:
-	docker stop kv-mojo && docker rm kv-mojo
-
-## Kubernetes targets
-autoscale-app:
-	kubectl autoscale rs kv-app --max 10
-
+## Kubernetes deploy targets
 start-app:
 	kubectl create -f k8s/redis-service-master.yaml
 	kubectl create -f k8s/redis-deployment-master.yaml
